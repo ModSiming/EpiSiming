@@ -1,0 +1,39 @@
+# NBJoint configuration file for the notebooks in this repo
+
+version: 0.13a
+
+path_to_notes: .
+
+contents:
+  toc_nb_name: 00.00-Pagina_Inicial.ipynb
+  show_index_in_toc: True
+
+header: "*Documentation for the EpiSiming epidemic simulation package*"
+
+navigators:
+  core_navigators:
+    - 00.00-Pagina_Inicial.ipynb
+  show_nb_title_in_nav: True
+  show_index_in_nav: False
+
+badges:
+  - alt: Google Colab
+    title: Open in Google Colab
+    url: https://colab.research.google.com/github/episiming/epsiming/blob/master/notebooks
+    src: https://colab.research.google.com/assets/colab-badge.svg
+  - alt: Binder
+    title: Open in Binder
+    url: https://mybinder.org/v2/gh/episiming/episiming/master?filepath=notebooks
+    src: https://mybinder.org/badge.svg
+  - alt: nbviewer
+    title: View in NBViewer
+    url: https://nbviewer.jupyter.org/github/episiming/episiming/blob/master/notebooks
+    label: view in
+    message: nbviewer
+    color: orange
+  - alt: download
+    title: Download Notebook
+    url: https://raw.githubusercontent.com/episiming/episiming/master/notebooks
+    label: download
+    message: notebook
+    color: 9cf

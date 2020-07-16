@@ -1,0 +1,10 @@
+numpy>=1.18
+scipy>=1.4
+sympy>=1.5
+pandas>=0.25
+matplotlib>=3.2
+seaborn>=0.10
+plotly>=4.5
+jupyter>=1
+notebook>=5.5
+networkx>=2.4
