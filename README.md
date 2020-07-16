@@ -15,4 +15,4 @@
 
 All **text** in this repository is available under the license [CC-BY-NC-ND license](LICENSE-TEXT); see also [Creative Commons Attribution-NonCommercial-NoDerivs 3.0](https://creativecommons.org/licenses/by-nc-nd/3.0/us/legalcode).
 
-All **codes** in this repository, including those in the [Jupyter notebooks,](https://jupyter.org/), are available under the [GNU-GPL](LICENSE-CODE); [GNU GENERAL PUBLIC LICENSE Version 3](https://www.gnu.org/licenses/gpl.html).
+All **codes** in this repository, including those in the [Jupyter notebooks](https://jupyter.org/), are available under the [GNU-GPL license](LICENSE-CODE); see also [GNU GENERAL PUBLIC LICENSE Version 3](https://www.gnu.org/licenses/gpl.html).
