@@ -1,4 +1,4 @@
-# EpiSiming - Epidemics Simulation Package
+# EpiSiming - Epidemics simulation package
 
 [![Text License: CC-BY-NC-ND license](https://img.shields.io/badge/Text%20License-CC--BY--NC--ND-yellow.svg)](https://opensource.org/licenses/MIT) [![Code License: GNU-GPLv3](https://img.shields.io/badge/Code%20License-GNU--GPLv3-yellow.svg)](https://www.gnu.org/licenses/gpl.html) ![GitHub repo size](https://img.shields.io/github/repo-size/rmsrosa/nbbinder)
 
@@ -7,7 +7,7 @@
 - [Beatriz Farah](https://github.com/beafarah)
 - [Cynthia Herkenhoff](https://github.com/herkenhoff-cynthia)
 - [Gil Miranda](https://github.com/mirandagil/)
-- [Ricardo M. S. Rosa](http://www.im.ufrj.br/rrosa/).
+- [Ricardo Rosa](http://www.im.ufrj.br/rrosa/).
 - [Rodrigo Peregrino](https://github.com/rodlcp)
 - [Thiago Holleben](https://github.com/hollebenthiago)
 
