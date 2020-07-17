@@ -13,6 +13,9 @@
 
 ## License
 
-All **text** in this repository is available under the license [CC-BY-NC-ND license](LICENSE-TEXT); see also [Creative Commons Attribution-NonCommercial-NoDerivs 3.0](https://creativecommons.org/licenses/by-nc-nd/3.0/us/legalcode).
+All **text** in this repository is available under the [CC-BY-NC-ND - Creative Commons Attribution-NonCommercial-NoDerivs 3.0 license](https://creativecommons.org/licenses/by-nc-nd/3.0/us/legalcode).
 
-All **codes** in this repository, including those in the [Jupyter notebooks](https://jupyter.org/), are available under the [GNU-GPL license](LICENSE-CODE); see also [GNU GENERAL PUBLIC LICENSE Version 3](https://www.gnu.org/licenses/gpl.html).
+All **codes** in this repository, including those in the [Jupyter notebook](https://jupyter.org/) cells, but excluding the `nbjoint` module, are available under the [GNU GENERAL PUBLIC LICENSE Version 3](https://www.gnu.org/licenses/gpl.html).
+
+The `nbjoint` module has an [MIT license](https://opensource.org/licenses/MIT) and is only used to embelish the collection of Jupyter notebooks, by generating a table of contents, badges, and navigator bars. The `nbjoint` module can be imported locally as it is done here or installed directly from [nbjoint at PyPI](https://pypi.org/project/nbjoint/) or [nbjoint at github](https://github.com/rmsrosa/nbjoint).
+
