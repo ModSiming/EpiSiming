@@ -14,4 +14,8 @@ compartimental and agent-based models.
 
 from .scenes import scenes
 
-name = 'EpiSiming'
+__name__ = 'EpiSiming'
+__homepage__ = "https://github.com/episiming/episiming"
+__license__ = "GNU GPL Version 3"
+__version__ = "alpha"
+__status__ = "Development"
