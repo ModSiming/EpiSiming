@@ -2,6 +2,10 @@
 
 [![Text License: CC-BY-NC-ND license](https://img.shields.io/badge/Text%20License-CC--BY--NC--ND-yellow.svg)](https://opensource.org/licenses/MIT) [![Code License: GNU-GPLv3](https://img.shields.io/badge/Code%20License-GNU--GPLv3-yellow.svg)](https://www.gnu.org/licenses/gpl.html) ![GitHub repo size](https://img.shields.io/github/repo-size/rmsrosa/nbbinder)
 
+This package has tools to simulate the evolution of an epidemic by
+compartimental and agent-based models.
+
+
 ## Team
 
 - [Beatriz Farah](https://github.com/beafarah)
@@ -10,6 +14,12 @@
 - [Ricardo Rosa](http://www.im.ufrj.br/rrosa/).
 - [Rodrigo Peregrino](https://github.com/rodlcp)
 - [Thiago Holleben](https://github.com/hollebenthiago)
+
+## About the name EpiSiming
+
+The name **EpiSiming** comes from combining the prefix **Epi**, from epidemic (of course), with the chinese word **Siming**, which [according to Wikipedia](https://en.wikipedia.org/wiki/Siming_(deity)), refers to a Chinese deity that makes fine adjustments to the fate of humankind.
+
+*Siming* is also the name of a Chinise district, and the pronunciation of this Chinese district can be heard in [How to Pronounce Siming District - PronounceNames.com](https://www.youtube.com/watch?v=VXkclmg96BQ).
 
 ## License
 
