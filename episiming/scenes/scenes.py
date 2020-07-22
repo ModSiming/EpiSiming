@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 from scipy import stats
 
-from episiming.scenes import functions as funcs
+import episiming.scenes.functions as funcs
 
 # type hints shotcuts
 List = typing.List

@@ -5,6 +5,6 @@
 Scenes for the EpiSiming epidemic simulation package.
 """
 
-# from . import scenes
+from .scenes import *
 
 # __name__ = 'EpiSiming Scenes'

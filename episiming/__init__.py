@@ -12,7 +12,7 @@ This package has tools to simulate the evolution of an epidemic by
 compartimental and agent-based models.
 """
 
-from .scenes import scenes
+from . import scenes
 
 __name__ = 'EpiSiming'
 __homepage__ = "https://github.com/episiming/episiming"
