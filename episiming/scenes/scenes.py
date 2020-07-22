@@ -318,7 +318,8 @@ class RiodeJaneiro(Scene):
 
     def set_foundation(self, scale: float = 1) -> None:
         pop_matrix_file \
-            = os.path.join('..', 'input', 'dados_rio',
+            = os.path.join(os.path.dirname(__file__),
+                           'dados_rio',
                            'landscan_rio_corrigido.npy')
         self.pop_matrix \
             = (scale * np.load(pop_matrix_file)).astype(int)
@@ -327,11 +328,13 @@ class RiodeJaneiro(Scene):
         self.bl_length_y = 0.926
 
         nbh_matrix_file \
-            = os.path.join('..', 'input', 'dados_rio',
+            = os.path.join(os.path.dirname(__file__),
+                           'dados_rio',
                            'geoloc_Bairros_MRJ_fino_desloc.npy')
         self.nbh_matrix = np.load(nbh_matrix_file).astype(int)
 
-        with open(os.path.join('..', 'input', 'dados_rio',
+        with open(os.path.join(os.path.dirname(__file__),
+                               'dados_rio',
                                'bairros.yml')) as f:
             nbh = yaml.load(f, Loader=yaml.FullLoader)
             self.nbh_name_to_id = nbh['bairros_id']
@@ -341,8 +344,7 @@ class RiodeJaneiro(Scene):
         self.res_sizes_dens = [.21, .26, .20, .17, .08, .04, .02, 0.02]
 
         population_pyramid_file \
-            = os.path.join('..',
-                           'input',
+            = os.path.join(os.path.dirname(__file__),
                            'dados_rio',
                            'piramide_etaria_MRJ.csv')
 
