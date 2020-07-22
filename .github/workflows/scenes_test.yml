@@ -1,4 +1,4 @@
-name: Scene Tests
+name: Scenes Test
 
 on: [push]
 
