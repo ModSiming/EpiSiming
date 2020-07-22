@@ -24,5 +24,4 @@ jobs:
         pip install -r requirements.txt
     - name: Test
       run: |
-        cd tests
-        python scenes_test.py
+        python -m tests.scenes_test
