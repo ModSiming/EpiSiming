@@ -15,11 +15,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-import networkx as nx
-
-from collections import namedtuple
-from functools import partial
-from scipy.interpolate import interp2d
 from scipy import stats
 
 from episiming.scenes import functions as funcs
@@ -27,12 +22,16 @@ from episiming.scenes import functions as funcs
 # type hints shotcuts
 List = typing.List
 
+
 class Scene():
     """
+    Basic Scene class.
+
     It should be used for relatively small regions, where the blocks
     have all the same sizes. For regions encompassing several latitudes,
     we need to use variable-length blocks.
     """
+
     def __init__(self) -> None:
         """
         Instantiates the region.
@@ -82,15 +81,16 @@ class Scene():
                 (positive) integer id.
 
             res_sizes_dens: list
-                A list where each index `j` represents the fraction of the 
+                A list where each index `j` represents the fraction of the
                 total number of residences with `j+1` residents.
         """
-        self.pop_matrix = np.array([[1,1],[1,1]])
+
+        self.pop_matrix = np.array([[1, 1], [1, 1]])
 
         self.bl_length_x = 1
         self.bl_length_y = 1
 
-        self.nbh_matrix = np.array([[1,2],[3,4]])
+        self.nbh_matrix = np.array([[1, 2], [3, 4]])
 
         self.nbh_name_to_id = {'1': 1, '2': 2, '3': 3, '4': 4}
         self.nbh_id_to_name = {1: '1', 2: '2', 3: '3', 4: '4'}
@@ -103,7 +103,7 @@ class Scene():
         ydim, xdim = self.pop_matrix.shape
 
         self.xextent = xdim * self.bl_length_x
-        self.yextent = ydim * self.bl_length_y    
+        self.yextent = ydim * self.bl_length_y
 
         xscale = self.nbh_matrix.shape[1] // self.pop_matrix.shape[1]
         yscale = self.nbh_matrix.shape[0] // self.pop_matrix.shape[0]
@@ -120,11 +120,11 @@ class Scene():
                                         self.res_sizes_dens)
 
         self.res_bl_fino, self.res_bl_subbl, self.res_pos \
-            =  funcs.distrib_res_fina(self.pop_matrix,
-                                      self.pop_matrix_fine,
-                                      self.bl_res,
-                                      self.bl_length_x,
-                                      self.bl_length_y)
+            = funcs.distrib_res_fina(self.pop_matrix,
+                                     self.pop_matrix_fine,
+                                     self.bl_res,
+                                     self.bl_length_x,
+                                     self.bl_length_y)
 
         self.res_br = self.nbh_matrix.flatten()[self.res_bl_fino]
 
@@ -152,7 +152,7 @@ class Scene():
                 'Argument rho_sus should be either a (positive) float or \
 a list of (positive) floats')
 
-    def set_infectibility(self, rho_inf):
+    def set_infectivity(self, rho_inf):
         """
         Set the infectibility factor.
 
@@ -164,45 +164,45 @@ a list of (positive) floats')
         if type(rho_inf) == float:
             self.pop_rho_inf = self.num_pop * [rho_inf]
         elif type(rho_inf) == list and len(rho_inf) == self.num_pop:
-            self.pop_rho_inf = rho_inf   
+            self.pop_rho_inf = rho_inf
         else:
             raise AttributeError(
                 'Argument rho_inf should be either a (positive) float or \
 a list of (positive) floats')
 
-    def plot_pop(self, nbh=None, **kargs):                  
+    def plot_pop(self, nbh=None, **kargs):
         plt.grid(False)
         plt.xlim(0, self.xextent)
         plt.ylim(0, self.yextent)
-        plt.plot(self.pop_pos[:,0], self.pop_pos[:,1], 'o', markersize=1, 
+        plt.plot(self.pop_pos[:, 0], self.pop_pos[:, 1], 'o', markersize=1,
                  **kargs)
 
     def plot_res(self, nbh=None, **kargs):
         if nbh and (nbh.upper() in self.nbh_name_to_id.keys() or
-                     nbh in self.nbh_id_to_name.keys()):
+                    nbh in self.nbh_id_to_name.keys()):
             if type(nbh) == str:
                 res_pos_sel \
-                    = np.array([self.res_pos[k] 
+                    = np.array([self.res_pos[k]
                                 for k in range(len(self.res_pos))
-                                if self.res_br[k] \
-                                    == self.nbh_name_to_id[nbh.upper()]])
+                                if self.res_br[k]
+                                == self.nbh_name_to_id[nbh.upper()]])
             else:
                 res_pos_sel \
-                    = np.array([self.res_pos[k] 
+                    = np.array([self.res_pos[k]
                                 for k in range(len(self.res_pos))
-                                if self.res_br[k] \
-                                    == nbh])
+                                if self.res_br[k] == nbh])
         else:
             res_pos_sel = self.res_pos
         plt.grid(False)
         plt.xlim(0, self.xextent)
         plt.ylim(0, self.yextent)
-        plt.plot(res_pos_sel[:,0], res_pos_sel[:,1], 'o', markersize=1, 
+        plt.plot(res_pos_sel[:, 0], res_pos_sel[:, 1], 'o', markersize=1,
                  **kargs)
 
     def show_nbh(self, **kargs):
         plt.imshow(self.nbh_matrix, cmap='tab20', interpolation='none',
-           extent=[0,self.xextent,0,self.yextent], **kargs)
+                   extent=[0, self.xextent, 0, self.yextent], **kargs)
+
 
 class Random(Scene):
     def __init__(self, num_pop: int, xdim: int, ydim: int) -> None:
@@ -218,10 +218,10 @@ class Random(Scene):
         with the population of size `num_pop` being distributed randomly within
         these blocks. This defines `self.pop.matrix`.
 
-        The sides `self.bl_length_x` and `self.bl_length_y` of the block are 
+        The sides `self.bl_length_x` and `self.bl_length_y` of the block are
         set to 1.
 
-        A neighborhood matrix `self.nbh_matrix` of dimension xdim * ydim 
+        A neighborhood matrix `self.nbh_matrix` of dimension xdim * ydim
         are set with neighborhood id going from 1 to xdim * ydim. Each
         neighborhood id `n` is associated with its neighborhood name `"n"`.
         This association gives rise to two dictionaries `self.nbh_name_to_id`
@@ -229,18 +229,18 @@ class Random(Scene):
 
         Finally, a synthetic density distribution `self.res_sizes_dens` of
         the fraction of residences per residence size is defined.
-        
+
         Input:
         ------
             num_pop: int
                 population size.
-            
+
             xdim: int
                 number of blocks in the x-direction
 
             ydim: int
                 number of blocks in the y-direction
-        
+
         Attributes created:
         -------------------
 
@@ -273,7 +273,7 @@ class Random(Scene):
                 (positive) integer id.
 
             res_sizes_dens: list
-                A list where each index `j` represents the fraction of the 
+                A list where each index `j` represents the fraction of the
                 total number of residences with `j+1` residents.
         """
 
@@ -281,7 +281,7 @@ class Random(Scene):
             = np.reshape(
                 np.histogram(
                     random.choices(list(range(xdim * ydim)), k=num_pop),
-                    bins = np.arange(xdim * ydim + 1))[0],
+                    bins=np.arange(xdim * ydim + 1))[0],
                 (ydim, xdim)
             )
 
@@ -290,14 +290,17 @@ class Random(Scene):
 
         self.nbh_matrix \
             = np.reshape(
-                np.arange( 1, xdim * ydim + 1).astype(int),
+                np.arange(1, xdim * ydim + 1).astype(int),
                 (ydim, xdim)
             )
 
-        self.nbh_name_to_id = {str(n): n for n in np.arange(1, xdim * ydim + 1)}
-        self.nbh_id_to_name = {n: str(n) for n in np.arange(1, xdim * ydim + 1)}
+        self.nbh_name_to_id \
+            = {str(n): n for n in np.arange(1, xdim * ydim + 1)}
+        self.nbh_id_to_name \
+            = {n: str(n) for n in np.arange(1, xdim * ydim + 1)}
 
         self.res_sizes_dens = [.25, .3, .2, .15, .05, .03, 0.02]
+
 
 class RiodeJaneiro(Scene):
     def __init__(self, scale: float = 1) -> None:
@@ -311,7 +314,7 @@ class RiodeJaneiro(Scene):
         self.set_foundation(scale)
         self.set_population()
         self.set_susceptibility()
-        self.set_infectibility()
+        self.set_infectivity()
 
     def set_foundation(self, scale: float = 1) -> None:
         pop_matrix_file \
@@ -328,7 +331,7 @@ class RiodeJaneiro(Scene):
                            'geoloc_Bairros_MRJ_fino_desloc.npy')
         self.nbh_matrix = np.load(nbh_matrix_file).astype(int)
 
-        with open(os.path.join('..', 'input', 'dados_rio', 
+        with open(os.path.join('..', 'input', 'dados_rio',
                                'bairros.yml')) as f:
             nbh = yaml.load(f, Loader=yaml.FullLoader)
             self.nbh_name_to_id = nbh['bairros_id']
@@ -339,9 +342,9 @@ class RiodeJaneiro(Scene):
 
         population_pyramid_file \
             = os.path.join('..',
-                        'input',
-                        'dados_rio',
-                        'piramide_etaria_MRJ.csv')
+                           'input',
+                           'dados_rio',
+                           'piramide_etaria_MRJ.csv')
 
         population_pyramid = pd.read_csv(population_pyramid_file)
         age_groups = np.array([int(p[0:3])
@@ -349,23 +352,22 @@ class RiodeJaneiro(Scene):
 
         age_group_fractions \
             = population_pyramid.iloc[0][1:].values \
-                / population_pyramid.iloc[0][0]
+            / population_pyramid.iloc[0][0]
 
         age_max = 110
 
         self.age_fractions \
             = funcs.get_age_fractions(age_groups,
                                       age_group_fractions,
-                                      age_max
-                                      )
+                                      age_max)
 
     def set_susceptibility(self) -> None:
         rho_sus = np.ones(self.num_pop)
 
-    def set_infectibility(self,
-                          rho_forma: float = 0.8,
-                          rho_escala: float = 1.25
-                         ) -> None:
+    def set_infectivity(self,
+                        rho_forma: float = 0.8,
+                        rho_escala: float = 1.25
+                        ) -> None:
         """
         Set the infectibility epidemic parameters.
 
@@ -374,11 +376,6 @@ class RiodeJaneiro(Scene):
             rho_inf: float or list of float
                 Susceptibility factor. Should be positive.
         """
-        rho = stats.gamma.rvs(a=rho_forma,
-                              scale=rho_escala,
-                              size=self.num_pop)
-
-        
-
-
-        
+        rho_inf = stats.gamma.rvs(a=rho_forma,
+                                  scale=rho_escala,
+                                  size=self.num_pop)

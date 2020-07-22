@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # __init__.py
 #
-#"""
-#Scenes for the EpiSiming epidemic simulation package.
-#"""
+"""
+Scenes for the EpiSiming epidemic simulation package.
+"""
 
-#from . import scenes
+# from . import scenes
 
-#name = 'EpiSiming Scenes'
+# __name__ = 'EpiSiming Scenes'

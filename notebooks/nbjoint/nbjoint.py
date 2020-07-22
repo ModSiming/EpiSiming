@@ -1103,7 +1103,7 @@ def joint(aux: str = None,
         and `show_index_in_nav` for the function `add_navigators()`
 
     badges: list
-        A list of dictionaries with keys to composing each badge 
+        A list of dictionaries with keys to composing each badge
         in the cell. See the function `add_badge()` for details.
 
     exports: list
