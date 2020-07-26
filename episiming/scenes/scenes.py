@@ -112,27 +112,27 @@ class Scene():
         self.blsub_length_y = self.bl_length_y / yscale / 10
 
         self.pop_matrix_fine, _, _ \
-            = funcs.interp_matrix(self.pop_matrix, self.nbh_matrix)
+            = funcs.interpolate_matrix(self.pop_matrix, self.nbh_matrix)
 
         self.res_size, self.res_pop, self.pop_res, \
             self.res_bl, self.bl_pop, self.bl_res \
-            = funcs.distribui_pop_e_res(self.pop_matrix,
-                                        self.res_sizes_dens)
+            = funcs.alloc_pop_res_to_blocks(self.pop_matrix,
+                                            self.res_sizes_dens)
 
         self.res_bl_fino, self.res_bl_subbl, self.res_pos \
-            = funcs.distrib_res_fina(self.pop_matrix,
-                                     self.pop_matrix_fine,
-                                     self.bl_res,
-                                     self.bl_length_x,
-                                     self.bl_length_y)
+            = funcs.alloc_res_to_subblocks(self.pop_matrix,
+                                           self.pop_matrix_fine,
+                                           self.bl_res,
+                                           self.bl_length_x,
+                                           self.bl_length_y)
 
         self.res_br = self.nbh_matrix.flatten()[self.res_bl_fino]
 
-        self.pop_pos = funcs.posiciona_pop(self.num_pop,
-                                           len(self.res_sizes_dens),
-                                           self.res_pop, self.res_pos,
-                                           self.blsub_length_x,
-                                           self.blsub_length_y)
+        self.pop_pos = funcs.position_pop(self.num_pop,
+                                          len(self.res_sizes_dens),
+                                          self.res_pop, self.res_pos,
+                                          self.blsub_length_x,
+                                          self.blsub_length_y)
 
     def set_susceptibility(self, rho_sus):
         """

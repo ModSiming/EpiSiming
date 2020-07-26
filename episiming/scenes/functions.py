@@ -16,7 +16,7 @@ from scipy.interpolate import interp2d
 List = typing.List
 
 
-def interp_matrix(matrix, finer_matrix):
+def interpolate_matrix(matrix, finer_matrix):
     '''
     Generates an interpolated matrix based on a finer mask matrix.
 
@@ -28,8 +28,8 @@ def interp_matrix(matrix, finer_matrix):
     if (finer_matrix.shape[0] % matrix.shape[0]
             + finer_matrix.shape[1] % matrix.shape[1] > 0):
         raise AttributeError(
-            'Each dimension of the "finer_matrix" has to be a (positive) '
-            + 'integer multiple of those of the given "matrix".')
+            'Each dimension of the "finer_matrix" has to be an integer '
+            + 'multiple of those of the given "matrix".')
 
     refinement_x = finer_matrix.shape[1] // matrix.shape[1]
     refinement_y = finer_matrix.shape[0] // matrix.shape[0]
@@ -102,9 +102,9 @@ def interp_matrix(matrix, finer_matrix):
     return matrix_interpd, matrix_fixed, num_pop_displaced
 
 
-def gera_tam_residencias(num_pop, dens_tam_res):
+def gen_res_size(num_pop, dens_tam_res):
     '''
-    Retorna uma "lista de residências", indicando o tamanho de cada uma delas.
+    Generates a list with the size of each residence.
 
     A densidade de residências por tamanho de residência `dens_tam_res`
     é utilizada como densidade de probabilidade para a geração das residências
@@ -128,8 +128,10 @@ def gera_tam_residencias(num_pop, dens_tam_res):
     return res_tam
 
 
-def associa_pop_residencia(res_tam, res_0=0, ind_0=0):
+def link_pop_and_res(res_tam, res_0=0, ind_0=0):
     '''
+    Returns two lists linking residences to its individuals and vice-versa.
+
     Retorna uma lista com a residência de cada indivíduo
     e uma lista com os indivíduos em cada residência.
 
@@ -149,7 +151,7 @@ def associa_pop_residencia(res_tam, res_0=0, ind_0=0):
     return pop_res, res_pop
 
 
-def distribui_pop_e_res(pop_matrix, dens_tam_res):
+def alloc_pop_res_to_blocks(pop_matrix, dens_tam_res):
     '''
     Distribui as residências e seus residentes pelo reticulado.
 
@@ -199,12 +201,9 @@ def distribui_pop_e_res(pop_matrix, dens_tam_res):
     for k in range(xdim * ydim):
         num_pop_local = pop_matrix[k // xdim, k % xdim]
         if num_pop_local > 0:
-            res_tam_local = gera_tam_residencias(num_pop_local,
-                                                 dens_tam_res)
+            res_tam_local = gen_res_size(num_pop_local, dens_tam_res)
             pop_res_local, res_pop_local \
-                = associa_pop_residencia(res_tam_local,
-                                         res_cum,
-                                         ind_cum)
+                = link_pop_and_res(res_tam_local, res_cum, ind_cum)
             res_bl += num_pop_local*[k]
             res_tam += res_tam_local
             pop_res += pop_res_local
@@ -217,8 +216,8 @@ def distribui_pop_e_res(pop_matrix, dens_tam_res):
     return res_tam, res_pop, pop_res, res_bl, bl_pop, bl_res
 
 
-def distrib_res_fina(pop_matrix, matriz_fina, bl_res,
-                     bl_length_x, bl_length_y):
+def alloc_res_to_subblocks(pop_matrix, matriz_fina, bl_res,
+                           bl_length_x, bl_length_y):
     '''
     Distribui as residências pelo reticulado da matriz fina.
 
@@ -233,8 +232,8 @@ def distrib_res_fina(pop_matrix, matriz_fina, bl_res,
     if (matriz_fina.shape[0] % pop_matrix.shape[0]
        + matriz_fina.shape[1] % pop_matrix.shape[1] > 0):
         raise AttributeError(
-            'Each dimension of `matrix_fine` should be a multiple of the \n'
-            + 'corresponding dimension of `pop_matrix`.')
+            'Each dimension of `matrix_fine` should be an integer multiple\n'
+            + 'of the corresponding dimension of `pop_matrix`.')
 
     tx_refinamento_x = matriz_fina.shape[1] // pop_matrix.shape[1]
     tx_refinamento_y = matriz_fina.shape[0] // pop_matrix.shape[0]
@@ -306,8 +305,8 @@ def distrib_res_fina(pop_matrix, matriz_fina, bl_res,
     return res_bl_fino, res_bl_subbl, res_pos
 
 
-def posiciona_pop(num_pop, res_tam_max, res_pop, res_pos,
-                  micro_escala_x, micro_escala_y):
+def position_pop(num_pop, res_tam_max, res_pop, res_pos,
+                 micro_escala_x, micro_escala_y):
     template = [np.array([(0, 0)])]
 
     for m in range(1, res_tam_max):
@@ -327,7 +326,7 @@ def posiciona_pop(num_pop, res_tam_max, res_pop, res_pos,
 
 def get_age_fractions(age_groups: List[int],
                       age_group_fractions: List[int],
-                      age_max: int = 100,
+                      age_max: int = None,
                       interp: str = 'linear'):
     '''
     Interpolates the population pyramid.
@@ -367,6 +366,9 @@ def get_age_fractions(age_groups: List[int],
 
     # interpola/extrapola pirâmide populacional
     age_fractions = list()
+
+    if not age_max:
+        age_max = max(100, 2*age_groups[-1] - age_groups[-2])
 
     if interp == 'linear':
         for j in range(len(age_groups)-1):
