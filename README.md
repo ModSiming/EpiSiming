@@ -7,13 +7,12 @@
 This package has tools to simulate the evolution of an epidemic by
 compartimental and agent-based models.
 
-
 ## Team
 
 - [Beatriz Farah](https://github.com/beafarah)
 - [Cynthia Herkenhoff](https://github.com/herkenhoff-cynthia)
 - [Gil Miranda](https://github.com/mirandagil/)
-- [Ricardo Rosa](http://www.im.ufrj.br/rrosa/).
+- [Ricardo Rosa](http://www.im.ufrj.br/rrosa/)
 - [Rodrigo Peregrino](https://github.com/rodlcp)
 - [Thiago Holleben](https://github.com/hollebenthiago)
 
