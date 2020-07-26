@@ -141,12 +141,14 @@ def link_pop_and_res(res_tam, res_0=0, ind_0=0):
     '''
     pop_res = list()  # índice da residência de cada indivíduo
     res_pop = list()  # índice dos indivíduos em cada residência
-    individuo = ind_0
-    residencia = res_0
-    for k in range(len(res_tam)):
-        pop_res += res_tam[k]*[residencia + k]
-        res_pop.append(list(range(individuo, individuo + res_tam[k])))
-        individuo += res_tam[k]
+
+    res = res_0
+    ind = ind_0
+    for size in res_tam:
+        pop_res += size * [res]
+        res_pop.append(list(range(ind, ind + size)))
+        res += 1
+        ind += size
 
     return pop_res, res_pop
 
@@ -325,7 +327,7 @@ def position_pop(num_pop, res_tam_max, res_pop, res_pos,
 
 
 def get_age_fractions(age_groups: List[int],
-                      age_group_fractions: List[int],
+                      age_group_fractions: List[float],
                       age_max: int = None,
                       interp: str = 'linear'):
     '''
@@ -370,16 +372,11 @@ def get_age_fractions(age_groups: List[int],
     if not age_max:
         age_max = max(100, 2*age_groups[-1] - age_groups[-2])
 
-    if interp == 'linear':
-        for j in range(len(age_groups)-1):
-            age_fractions += (age_groups[j+1] - age_groups[j]) \
-                * [age_group_fractions[j]/(age_groups[j+1]-age_groups[j])]
-        age_fractions += (age_max - age_groups[-1]) \
-            * [age_group_fractions[-1]/(age_max-age_groups[-1])]
-    elif interp == 'constant':
-        for j in range(len(age_groups)-1):
-            age_fractions += (age_groups[j+1] - age_groups[j]) \
-                * [age_group_fractions[j]/(age_groups[j+1]-age_groups[j])]
+    if interp == 'constant' or interp == 'linear':
+        for a1, a, af in zip(age_groups[1:], age_groups[:-1],
+                             age_group_fractions[:-1]):
+            age_fractions += (a1 - a) * [af / (a1 - a)]
+
         age_fractions += (age_max - age_groups[-1]) \
             * [age_group_fractions[-1]/(age_max-age_groups[-1])]
     else:
