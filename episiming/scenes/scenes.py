@@ -178,19 +178,17 @@ a list of (positive) floats')
                  **kargs)
 
     def plot_res(self, nbh=None, **kargs):
-        if nbh and (nbh.upper() in self.nbh_name_to_id.keys() or
-                    nbh in self.nbh_id_to_name.keys()):
-            if type(nbh) == str:
+        if nbh:
+            if type(nbh) == str and nbh.upper() in self.nbh_name_to_id.keys():
                 res_pos_sel \
-                    = np.array([self.res_pos[k]
-                                for k in range(len(self.res_pos))
-                                if self.res_br[k]
-                                == self.nbh_name_to_id[nbh.upper()]])
-            else:
+                    = np.array([pos for pos, br
+                                in zip(self.res_pos, self.res_br)
+                                if br == self.nbh_name_to_id[nbh.upper()]])
+            elif type(nbh) == int and nbh in self.nbh_id_to_name.keys():
                 res_pos_sel \
-                    = np.array([self.res_pos[k]
-                                for k in range(len(self.res_pos))
-                                if self.res_br[k] == nbh])
+                    = np.array([pos for pos, br
+                                in zip(self.res_pos, self.res_br)
+                                if br == nbh])
         else:
             res_pos_sel = self.res_pos
         plt.grid(False)
