@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.getcwd(), '..')))
 
 import episiming
 
-rio = episiming.scenes.RiodeJaneiro(1/10)
+rio = episiming.scenes.RiodeJaneiro(1/100)
 
 assert(sum(rio.res_size) == rio.num_pop), \
     "sum(rio.res_size) should be equal to rio.num_pop"
