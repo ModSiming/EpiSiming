@@ -445,27 +445,28 @@ def get_age_fractions(age_groups: List[int],
                     j += 1
         return np.hstack(casos)
 
-def weights(list):
+def weighted(list):
     return list / sum(list)
 
-def gen_age(residencias, age_fractions, age_range):
+def gen_age(residencias, weights, age_range):
     n = len(residencias)
-    n_ages = len(age_fractions)
+    n_ages = len(weights)
     ages = -1 * np.ones(n, int)
-    max_people = np.ceil(n * age_fractions / sum(age_fractions))
+    max_people = np.ceil(n * weights / sum(weights))
 
     aux = [np.arange(n, dtype=int)[residencias == i] for i in range(max(residencias)+1)]
 
     for i in aux:
-        ages[i[0]] = np.random.choice(range(n_ages), p=weights(max_people * age_range[0]))
-        max_people[ages[i[0]]] -= 1
-        if len(i) == 2:
-            ages[i[2]] = np.random.choice(range(n_ages), p=weights(max_people * (age_range[1] if np.random.rand() > 0.9 else age_range[0])))
-            max_people[ages[i[2]]] -= 1
+        if len(i) > 0:
+            ages[i[0]] = np.random.choice(range(n_ages), p=weighted(max_people * age_range[0]))
+            max_people[ages[i[0]]] -= 1
+            if len(i) == 2:
+                ages[i[1]] = np.random.choice(range(n_ages), p=weighted(max_people * (age_range[1] if np.random.rand() > 0.9 else age_range[0])))
+                max_people[ages[i[1]]] -= 1
 
     for i in aux:
         if len(i) > 2:
             for j in range(1, len(i)):
-                ages[i[j]] = np.random.choice(range(n_ages), p=weights(max_people))
+                ages[i[j]] = np.random.choice(range(n_ages), p=weighted(max_people))
                 max_people[ages[i[j]]] -= 1
     return ages
