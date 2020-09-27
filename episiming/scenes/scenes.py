@@ -396,10 +396,10 @@ class RiodeJaneiro(Scene):
         rho_inf = stats.gamma.rvs(a=rho_forma,
                                   scale=rho_escala,
                                   size=self.num_pop)
-
+    #pegar valores melhores
     def set_kappa(self, 
                   delta: float = .72,
-                  eta: float = , eps = 0):
+                  eta: float = 1, eps = 0):
         """
         Set the parameters for the kappa function.
 
