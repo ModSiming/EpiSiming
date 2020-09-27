@@ -170,6 +170,22 @@ a list of (positive) floats')
                 'Argument rho_inf should be either a (positive) float or \
 a list of (positive) floats')
 
+    def set_kappa(self, delta, eta, eps = 0):
+        """
+        Set the parameters for the kappa function.
+
+        Input:
+        ------
+            delta: float
+            eta: float
+            eps: float
+
+                Parameters of a lognormal distribution function (kappa)
+                eps is noise to be added to the parameters for each individual
+        """
+        self.pop_delta = self.num_pop * np.array([delta]) + np.random.uniform(low=-eps, high=eps, size=(self.num_pop,))
+        self.pop_eta = self.num_pop * np.array([delta]) + np.random.uniform(low=-eps, high=eps, size=(self.num_pop,))
+
     def plot_pop(self, nbh=None, **kargs):
         plt.grid(False)
         plt.xlim(0, self.xextent)
@@ -313,6 +329,7 @@ class RiodeJaneiro(Scene):
         self.set_population()
         self.set_susceptibility()
         self.set_infectivity()
+        self.set_kappa()
 
     def set_foundation(self, scale: float = 1) -> None:
         pop_matrix_file \
@@ -379,3 +396,21 @@ class RiodeJaneiro(Scene):
         rho_inf = stats.gamma.rvs(a=rho_forma,
                                   scale=rho_escala,
                                   size=self.num_pop)
+
+    def set_kappa(self, 
+                  delta: float = .72,
+                  eta: float = , eps = 0):
+        """
+        Set the parameters for the kappa function.
+
+        Input:
+        ------
+            delta: float
+            eta: float
+            eps: float
+
+                Parameters of a lognormal distribution function (kappa)
+                eps is noise to be added to the parameters for each individual
+        """
+        self.pop_delta = self.num_pop * np.array([delta]) + np.random.uniform(low=-eps, high=eps, size=(self.num_pop,))
+        self.pop_eta = self.num_pop * np.array([delta]) + np.random.uniform(low=-eps, high=eps, size=(self.num_pop,))

@@ -387,66 +387,66 @@ def get_age_fractions(age_groups: List[int],
 
     return age_fractions
 
-    def set_subnot(dic_cases, subnot):
-        rng = dic_casos.keys()
-        n_cases = [x * subnot for x in dic_cases.values()]
-        return dict(zip(rng, n_cases))
+def set_subnot(dic_cases, subnot):
+    rng = dic_casos.keys()
+    n_cases = [x * subnot for x in dic_cases.values()]
+    return dict(zip(rng, n_cases))
 
-    def rescale_cases(scale, dic_cases):
-        if scale == 1:
-            rescaled_cases = dic_cases
-        else:
-            cases = np.array(list(dic_cases.values()))
-            total_rescaled_cases = np.rint(np.sum(cases) / scale)
-            weights = (cases / np.sum(cases))
-            dummy = np.random.choice(list(dic_cases.keys()), p=weights, size=int(total_rescaled_cases))
-            rescaled_cases = dict(zip(dic_cases.keys(), np.zeros(len(dic_cases.keys()))))
-            for i in dummy:
-                rescaled_cases[i] += 1
-        return rescaled_cases
+def rescale_cases(scale, dic_cases):
+    if scale == 1:
+        rescaled_cases = dic_cases
+    else:
+        cases = np.array(list(dic_cases.values()))
+        total_rescaled_cases = np.rint(np.sum(cases) / scale)
+        weights = (cases / np.sum(cases))
+        dummy = np.random.choice(list(dic_cases.keys()), p=weights, size=int(total_rescaled_cases))
+        rescaled_cases = dict(zip(dic_cases.keys(), np.zeros(len(dic_cases.keys()))))
+        for i in dummy:
+            rescaled_cases[i] += 1
+    return rescaled_cases
 
-    def start_case_distribution(scale, dic_cases, mtrx_locations, res_pos, pop_pos):
+def start_case_distribution(scale, dic_cases, mtrx_locations, res_pos, pop_pos):
 
-        return 0
+    return 0
 
-    def distribuicao_inicial_casos(tx_reducao, dic_casos, mtrx_bairros, res_posicoes, res_individuos):
-        mtrx_bairros = corrige_mtrx(mtrx_bairros, 1)
-        pos_res_blocos = np.round(np.array(res_posicoes) * [9.9, 9.8])
-        posicao_bairro = np.array([mtrx_bairros[int(x[1]), int(x[0])] for x in pos_res_blocos])
-        dic_casos_reduzida = reducao_casos(tx_reducao, dic_casos)
+def distribuicao_inicial_casos(tx_reducao, dic_casos, mtrx_bairros, res_posicoes, res_individuos):
+    mtrx_bairros = corrige_mtrx(mtrx_bairros, 1)
+    pos_res_blocos = np.round(np.array(res_posicoes) * [9.9, 9.8])
+    posicao_bairro = np.array([mtrx_bairros[int(x[1]), int(x[0])] for x in pos_res_blocos])
+    dic_casos_reduzida = reducao_casos(tx_reducao, dic_casos)
 
-        beta = .6
-        casos = []
-        ids_bairros = np.arange(1, 164)
-        rng = np.arange(len(pos_res_blocos))
-        for i in ids_bairros:
-            res_no_bairro = posicao_bairro == i
-            indices_no_bairro = rng[res_no_bairro]
-            qt_casos = dic_casos_reduzida[i]
-            if (qt_casos > 0) & (len(indices_no_bairro) > 0):
-                j = 0
-                dist = 0
-                permt_residencias = np.random.permutation(indices_no_bairro)
-                while (qt_casos > 0 and j < len(permt_residencias)):
-                    res_caso = permt_residencias[j]
-                    caso_primario = np.random.choice(res_individuos[res_caso])
-                    indice_primario = res_individuos[res_caso].index(caso_primario)
-                    qt_casa = len(res_individuos[res_caso])
-                    infecta = np.random.rand(qt_casa)
-                    infecta[indice_primario] = 1
-                    rng_res = np.arange(qt_casa)
-                    indice_infectados = rng_res[infecta > beta]
-                    infectados = np.array(res_individuos[res_caso])[indice_infectados]
-                    if qt_casos - len(infectados) < 0:
-                        infectados = infectados[:int(qt_casos)]
-                    qt_casos -= len(infectados)
-                    dist += len(infectados)
-                    casos.append(infectados)
-                    j += 1
-        return np.hstack(casos)
+    beta = .6
+    casos = []
+    ids_bairros = np.arange(1, 164)
+    rng = np.arange(len(pos_res_blocos))
+    for i in ids_bairros:
+        res_no_bairro = posicao_bairro == i
+        indices_no_bairro = rng[res_no_bairro]
+        qt_casos = dic_casos_reduzida[i]
+        if (qt_casos > 0) & (len(indices_no_bairro) > 0):
+            j = 0
+            dist = 0
+            permt_residencias = np.random.permutation(indices_no_bairro)
+            while (qt_casos > 0 and j < len(permt_residencias)):
+                res_caso = permt_residencias[j]
+                caso_primario = np.random.choice(res_individuos[res_caso])
+                indice_primario = res_individuos[res_caso].index(caso_primario)
+                qt_casa = len(res_individuos[res_caso])
+                infecta = np.random.rand(qt_casa)
+                infecta[indice_primario] = 1
+                rng_res = np.arange(qt_casa)
+                indice_infectados = rng_res[infecta > beta]
+                infectados = np.array(res_individuos[res_caso])[indice_infectados]
+                if qt_casos - len(infectados) < 0:
+                    infectados = infectados[:int(qt_casos)]
+                qt_casos -= len(infectados)
+                dist += len(infectados)
+                casos.append(infectados)
+                j += 1
+    return np.hstack(casos)
 
-def weighted(list):
-    return list / sum(list)
+def weighted(l):
+    return np.array(l)/ sum(np.array(l))
 
 def gen_age(residencias, weights, age_range):
     n = len(residencias)
