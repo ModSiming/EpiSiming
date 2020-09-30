@@ -1,6 +1,6 @@
 # EpiSiming - Epidemics simulation package
 
-![Scenes Test Workflow Status](https://github.com/episiming/episiming/workflows/Scenes%20Test/badge.svg) ![Flake8 Lint Test Workflow Status](https://github.com/episiming/episiming/workflows/Flake8%20Lint%20Test/badge.svg)
+![Scenes Test Workflow Status](https://github.com/episiming/episiming/workflows/Scenes%20Test/badge.svg) ![Scene Functions Test Workflow Status](https://github.com/episiming/episiming/workflows/Scene%20Functions%20Test/badge.svg) ![Flake8 Lint Test Workflow Status](https://github.com/episiming/episiming/workflows/Flake8%20Lint%20Test/badge.svg)
 
 [![Text License: CC-BY-NC-ND license](https://img.shields.io/badge/Text%20License-CC--BY--NC--ND-yellow.svg)](https://opensource.org/licenses/MIT) [![Code License: GNU-GPLv3](https://img.shields.io/badge/Code%20License-GNU--GPLv3-yellow.svg)](https://www.gnu.org/licenses/gpl.html) ![GitHub repo size](https://img.shields.io/github/repo-size/episiming/episiming)
 
