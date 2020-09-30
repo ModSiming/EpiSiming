@@ -11,4 +11,4 @@ import episiming.scenes.functions as ef
 
 assert(ef.get_age_fractions([0, 2], [0.5, 0.5], 4)
        == [0.25, 0.25, 0.25, 0.25]), \
-       "blah"
+       "get_age_fractions failed to properly generate age fractions"
