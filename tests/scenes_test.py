@@ -1,7 +1,12 @@
-import os
-import sys
+# -*- coding: utf-8 -*-
+#
+"""
+Tests the classes that generates the scenes.
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.getcwd(), '..')))
+Currently, only the `Rio de Janeiro` class is implemented.
+
+Test it with `python -m tests.scenes_test` from the repo root directory.
+"""
 
 import episiming
 
