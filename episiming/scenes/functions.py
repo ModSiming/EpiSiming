@@ -11,10 +11,13 @@ import random
 import numpy as np
 
 from scipy.interpolate import interp2d
+from scipy.stats import lognorm
 
 # type hints shotcuts
 List = typing.List
 
+def weibull(x, a = 1, lamb = -2, abc = 4):
+    return np.floor((a / lamb) * (abc * x / lamb) ** (a - 1) * np.exp((-abc * x / lamb) ** a))
 
 def interpolate_matrix(matrix, finer_matrix):
     """
@@ -415,31 +418,79 @@ def start_case_distribution(scale, dic_cases, mtrx_locations, res_pos, res_pop, 
     ids_location = list(dic_cases.keys()) # ids from the locations (bairros, AP, RP, RA)
     rng = np.arange(len(res_pos))
     for i in ids_location:
-        res_location = res_br == i # Get residences from current location
-        res_location_index = rng[res_location]
+        # res_br array, res_location array booleano
+        res_location = res_br == i # Get residences from current location 
+        res_location_index = rng[res_location] # select
         n_cases = rescaled_cases[i] # Number of cases from current location
         if (n_cases > 0) & (len(res_location_index) > 0):
             j = 0
-            dist = 0
-            res_permt = np.random.permutation(res_location_index)
+            dist = 0 # ?
+            res_permt = np.random.permutation(res_location_index) # permuta as casas 
             while (n_cases > 0 and j < len(res_permt)):
-                res_cases = res_permt[j]
-                first_case = np.random.choice(res_pop[res_cases])
-                first_case_index = res_pop[res_cases].index(first_case)
-                n_res = len(res_pop[res_cases])
-                make_infection = np.random.rand(n_res)
-                make_infection[first_case_index] = 1
-                rng_res = np.arange(n_res)
+                res_cases = res_permt[j] # primeira casa após a permutação
+                first_case = np.random.choice(res_pop[res_cases]) # escolhe uma pessoa na casa(pelo indice na populacao) 
+                first_case_index = res_pop[res_cases].index(first_case) # pega o indice da pessoa na casa
+                n_res = len(res_pop[res_cases]) # numero de pessoas na casa
+                make_infection = np.random.rand(n_res) # gera um vetor aleatorio (entre 0 e 1) do tamanho do numero de pessoas na casa
+                make_infection[first_case_index] = 1 # o primeiro infectado tem que estar infectado
+                rng_res = np.arange(n_res) # copia da residencia
                 infectious_index = rng_res[make_infection > beta] # Indice relativo a casa dos infectados
                 infecteds = np.array(res_pop[res_cases])[infectious_index] # Indice geral dos infectados de dada casa
-                if n_cases - len(infecteds) < 0:
-                    infecteds = infecteds[:int(n_cases)]
-                n_cases -= len(infecteds)
-                dist += len(infecteds)
+                if n_cases - len(infecteds) < 0: # se passou, jogar casos fora
+                    infecteds = infecteds[:int(n_cases)] # joga os últimos casos fora
+                n_cases -= len(infecteds) 
+                dist += len(infecteds) # ?
                 cases_infect.append(infecteds)
                 j += 1
-    cases = {k:v for (k,v) in zip(np.hstack(cases_infect), [1]*len(np.hstack(cases_infect)))}
+    cases = {k:weibull(np.random.rand()) for k in np.hstack(cases_infect)} # k = indice da pessoa : tempo de infecção (já com a weibull)
     return cases
+
+def kappa_generator(res_pop, eps, eta = np.sqrt(-2*np.log(np.log(2))), gamma = 1/2.6, loc = 0.2, factor = 3.5): 
+    """
+    Generates the kappa function.
+
+    Each individual is assigned to a lognorm pdf
+    such that the parameters are given by set values
+    delta and eta plus some noise eps.
+
+    Input:
+    ------
+        
+        res_pop: list
+            Nested list of individuals by residence
+
+        eps: float
+            maximum value of noise to be added to delta and eta
+
+        eta: float
+            scale parameter of the lognorm pdf
+        
+        gamma: float
+            the s parameter of the lognorm pdf is given by log(2)/gamma
+        
+        loc: float
+            loc parameter of the lognorm pdf
+
+        factor: float
+            factor multiplying the lognorm pdf
+
+    Output:
+    -------
+        kappa: function
+            Recieves a parameter xs: list 
+                                    Time since infection for each individual
+    """
+    
+    delta = np.log(np.log(2)/gamma)
+    pop_flat = np.hstack(res_pop)
+    noise_delta = delta + eps * np.random.rand(pop_flat)
+    noise_eta = eta + eps * np.random.rand(pop_flat)
+    def kappa(xs):
+        result = factor * np.array([lognorm.pdf(x, s = np.exp(n_delta), scale = n_eta, loc = loc) for (n_delta, n_eta, x) in zip(noise_delta[0], noise_eta[1], xs)])
+        result[xs == 0] = 0
+        return result
+    return kappa
+
 
 def weighted(l):
     return np.array(l)/ sum(np.array(l))
