@@ -332,7 +332,7 @@ def position_pop(num_pop, res_tam_max, res_pop, res_pos,
 def get_age_fractions(age_groups: List[int],
                       age_group_fractions: List[float],
                       age_max: int = None,
-                      interp: str = 'linear'):
+                      interp: str = 'constant'):
     """
     Interpolates the population pyramid.
 
@@ -341,7 +341,7 @@ def get_age_fractions(age_groups: List[int],
     their population fractions and a maximum desired age and interpolates
     the data to output a pyramid with data for every year.
 
-    The interpolation can be either 'constant' by parts or 'linear' by parts.
+    The interpolation implemented so far is 'constant' by parts.
 
     Input:
     ------
@@ -356,11 +356,15 @@ def get_age_fractions(age_groups: List[int],
             if i is the last index
 
         age_max: int
-            The maximum age for the output pyramid
+            The maximum age for the output age pyramid. If not given,
+            the maximum age is taken to be the maximum between 100
+            and the last age in the list plus the difference between
+            the last age and the age before the last one.
 
         interp: str
-            The type of interpolation, which can be either piecewise
-            'constant' (default) or piecewise 'linear'.
+            The type of interpolation. Currently, only 'constant' is
+            implemented, which is taken as default value, leading
+            to a constant by parts interpolation.
 
     Output:
     -------
@@ -375,18 +379,19 @@ def get_age_fractions(age_groups: List[int],
     if not age_max:
         age_max = max(100, 2 * age_groups[-1] - age_groups[-2])
 
-    if interp == 'constant' or interp == 'linear':
+    if interp == 'constant':
         for a1, a, af in zip(age_groups[1:], age_groups[:-1],
                              age_group_fractions[:-1]):
+            # copies a1-a times the constant value af / (a1 - a)
             age_fractions += (a1 - a) * [af / (a1 - a)]
 
+        # analogous
         age_fractions += (age_max - age_groups[-1]) \
-                         * [age_group_fractions[-1] / (age_max - age_groups[-1])]
-    else:
-        raise ValueError("Argument 'interp' should be either 'linear'"
-                         + "or 'constant'.")
+            * [age_group_fractions[-1] / (age_max - age_groups[-1])]
 
-    #    age_fractions = np.array(age_fractions)
+    else:
+        raise ValueError("Only 'constant' is accepted for the 'interp' \
+argument")
 
     return age_fractions
 
