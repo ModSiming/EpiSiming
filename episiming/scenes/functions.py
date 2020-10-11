@@ -11,13 +11,11 @@ import random
 import numpy as np
 
 from scipy.interpolate import interp2d
-from scipy.stats import lognorm
+from scipy.stats import lognorm, weibull_min
 
 # type hints shotcuts
 List = typing.List
 
-def weibull(x, a = 1, lamb = -2, abc = 4):
-    return np.floor((a / lamb) * (abc * x / lamb) ** (a - 1) * np.exp((-abc * x / lamb) ** a))
 
 def interpolate_matrix(matrix, finer_matrix):
     """
@@ -413,7 +411,39 @@ def rescale_cases(dic_cases, scale):
             rescaled_cases[i] += 1
     return rescaled_cases
 
-def start_case_distribution(scale, dic_cases, mtrx_locations, res_pos, res_pop, res_br, pop_pos):
+def start_case_distribution(scale, dic_cases, mtrx_locations, res_pos, res_pop, res_br, pop_pos, c = 1, d = 2.5):
+    """
+    
+    
+    
+    Input:
+    ------
+    scale:
+    
+    dic_cases:
+    
+    mtrx_locations:
+    
+    res_pos:
+    
+    res_pop:
+    
+    res_br:
+    
+    pop_pos:
+    
+    c: float
+        shape parameter of weibull distribution
+   
+   d: float
+       scale parameter of weibull distribution
+       
+   Output:
+   -------
+    cases: dict
+        dictionary of index of the person infected and time since infection
+    
+    """
     locations_block = np.array(mtrx_locations[int(x[1]), int(x[0])] for x in res_pos)
     rescaled_cases = rescale_cases(dic_cases, scale)
 
@@ -447,10 +477,13 @@ def start_case_distribution(scale, dic_cases, mtrx_locations, res_pos, res_pop, 
                 dist += len(infecteds) # ?
                 cases_infect.append(infecteds)
                 j += 1
-    cases = {k:weibull(np.random.rand()) for k in np.hstack(cases_infect)} # k = indice da pessoa : tempo de infecção (já com a weibull)
+                
+
+    ys = np.floor(d*scipy.stats.weibull_min.rvs(c, size = len(np.hstack(cases_infect))
+    cases = {k:ys[i] for i,k in enumerate(np.hstack(cases_infect))} # k = indice da pessoa : tempo de infecção (já com a weibull)
     return cases
 
-def kappa_generator(res_pop, eps, eta = np.sqrt(-2*np.log(np.log(2))), gamma = 1/2.6, loc = 0.2, factor = 3.5): 
+def kappa_generator(num_pop, eps1, ep2, eta = np.sqrt(-2*np.log(np.log(2))), gamma = 1/2.6, loc = 0.2, factor = 3.5): 
     """
     Generates the kappa function.
 
@@ -464,9 +497,12 @@ def kappa_generator(res_pop, eps, eta = np.sqrt(-2*np.log(np.log(2))), gamma = 1
         res_pop: list
             Nested list of individuals by residence
 
-        eps: float
-            maximum value of noise to be added to delta and eta
-
+        eps1: float
+            maximum value of noise to be added to delta 
+            
+        eps2: float
+            maximum value of noise to be added to eta 
+            
         eta: float
             scale parameter of the lognorm pdf
         
@@ -481,20 +517,15 @@ def kappa_generator(res_pop, eps, eta = np.sqrt(-2*np.log(np.log(2))), gamma = 1
 
     Output:
     -------
-        kappa: function
-            Recieves a parameter xs: list 
-                                    Time since infection for each individual
+        noises: list
+            list of deltas and etas for each person in population
     """
     
     delta = np.log(np.log(2)/gamma)
-    pop_flat = np.hstack(res_pop)
-    noise_delta = delta + eps * np.random.rand(pop_flat)
-    noise_eta = eta + eps * np.random.rand(pop_flat)
-    def kappa(xs):
-        result = factor * np.array([lognorm.pdf(x, s = np.exp(n_delta), scale = n_eta, loc = loc) for (n_delta, n_eta, x) in zip(noise_delta[0], noise_eta[1], xs)])
-        result[xs == 0] = 0
-        return result
-    return kappa
+    pop = np.arange(num_pop)
+    noise_delta = delta + eps1 * np.random.rand(pop)
+    noise_eta = eta + eps2 * np.random.rand(pop)
+    return [noise_delta, noise_eta]
 
 
 def weighted(l):
