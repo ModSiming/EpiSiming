@@ -325,11 +325,13 @@ class RiodeJaneiro(Scene):
         generate the region and all the parameters.
         """
         self.name = 'Rio de Janeiro'
+        self.scale = scale
         self.set_foundation(scale)
         self.set_population()
         self.set_susceptibility()
         self.set_infectivity()
         self.set_kappa()
+        self.set_pop_age()
 
     def set_foundation(self, scale: float = 1) -> None:
         pop_matrix_file \
@@ -414,3 +416,6 @@ class RiodeJaneiro(Scene):
         """
         self.pop_delta = self.num_pop * np.array([delta]) + np.random.uniform(low=-eps, high=eps, size=(self.num_pop,))
         self.pop_eta = self.num_pop * np.array([delta]) + np.random.uniform(low=-eps, high=eps, size=(self.num_pop,))
+
+    def set_pop_age(self):
+        self.pop_age = funcs.gen_pop_age(self.res_pop, np.array(self.res_size), np.array(self.age_fractions), np.array(range(len(self.age_fractions))), len(self.pop_res))

@@ -44,7 +44,7 @@ class School:
             num_type = map(lambda x: np.rint(np.sum(x) * self.scale).astype(int), self.original_mtrx_school)
             ## Faz uma escolha aleatória com pesos nos blocos do heatmap de cada modalidade
             weight_type = map(lambda x: (x / np.sum(x)).flatten(), self.original_mtrx_school)
-            rescaled_school_type = map(lambda x, y: random.choices(rng, x, k=y), weight_type, num_type)
+            rescaled_school_type = map(lambda x, y: np.random.choice(rng, p=x, size=y), weight_type, num_type)
 
             ## Preenchemos, para cada modalidade, os blocos sorteados
             rescaled_mtrx = np.zeros(self.original_mtrx_school.shape)

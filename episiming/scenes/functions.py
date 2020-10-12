@@ -390,8 +390,9 @@ def get_age_fractions(age_groups: List[int],
     else:
         raise ValueError("Only 'constant' is accepted for the 'interp' \
 argument")
+        
 
-    return age_fractions
+    return np.array(age_fractions)
 
 def set_subnot(dic_cases, subnot):
     rng = dic_cases.keys()
