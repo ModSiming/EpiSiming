@@ -527,29 +527,110 @@ def kappa_generator(num_pop, eps1, ep2, eta = np.sqrt(-2*np.log(np.log(2))), gam
     noise_eta = eta + eps2 * np.random.rand(pop)
     return [noise_delta, noise_eta]
 
-
 def weighted(l):
-    return np.array(l)/ sum(np.array(l))
+    '''
+    Make a distribution out of a list or array.
+    
+    Given any data array or list, this function returns its distribution, or weights which sum to 1
+    
+    Input:
+    ------
+        l: list of float/int
+            List or Array of data to be made into a distribution
+    
+    Output:
+    -------
+        weighted: array of float/int
+            The same data as weighted array
+    '''
+    return np.array(l)/sum(np.array(l))
 
-def gen_age(residencias, weights, age_range):
-    n = len(residencias)
+def sample_from(weights, x):
+    '''
+    Draw a random sample from desired distribution using the uniform distribution,
+    this function mimics np.random.choice, but it's faster if we need to call it a lot of times
+    when it's not possible to vectorize.
+    
+    Input:
+    ------
+        weights: array of float
+            The weights of the distribution
+            
+        x: float
+            Sample previously drawn from uniform distribution, using np.random.rand()
+    
+    Output:
+    -------
+        weighted: int
+            Index of drawn sample from weights
+    '''
+    return (weights.cumsum() > x).argmax()
+
+def gen_pop_age(res, res_size, weights, age_groups, n_pop, adult_age = 19, two_res_prob = 0.9):
+    """
+    Generates the age for the entire population, following a distribution
+
+    Each residence is guaranteed to have at least one adult individual.
+    For residences with two individuals, there's a slight chance that the second individual is not an adult
+    The age which separates an adult from a non-adult is given by a parameter, and a sigmoid function is built upon this age.
+    
+    Input:
+    ------
+        
+        res_pop: list
+            Nested list of residences with it's individuals
+            
+        res_size: list
+            List with sizes of residences
+
+        weights: array of floats
+            Age distribution/weights for the location, this array needs to sum to 1
+
+        age_groups: Array of int
+            Group of ages that the model will gather individuals
+        
+        n_pop: int
+            Total number of the population
+        
+        adult_age: float
+            The age which the model should separate an adult from a non-adult
+        
+        two_res_prob: float
+            Probability of a second individual on a two size residence is an adult
+
+    Output:
+    -------
+        ages: Array of int
+            An array with the size of the population,
+            each entry representing the age of the individual corresponding to the index on the array
+    """
     n_ages = len(weights)
-    ages = -1 * np.ones(n, int)
-    max_people = np.ceil(n * weights / sum(weights))
-
-    aux = [np.arange(n, dtype=int)[residencias == i] for i in range(max(residencias)+1)]
-
-    for i in aux:
+    ages = -1 * np.ones(n_pop, int)
+    max_people = np.ceil(n_pop * weights / sum(weights))
+    aux = np.random.rand(n_pop)
+    age_range = [(np.tanh(i * (age_groups - adult_age)) + 1) / 2 for i in [2/3, -2/3]]
+    rng_ages = range(n_ages)
+    
+    ages_res_adults = np.random.choice(rng_ages, p = weighted(max_people*age_range[0]), size = len(res))
+    ages_res_two = np.random.choice(rng_ages, p = weighted(max_people * (age_range[1] if np.random.rand() > two_res_prob else age_range[0])), size = np.count_nonzero(res_size == 2))
+    k_adults = 0
+    k_two_size = 0
+    for i in res:
         if len(i) > 0:
-            ages[i[0]] = np.random.choice(range(n_ages), p=weighted(max_people * age_range[0]))
+            ages[i[0]] = ages_res_adults[k_adults]
             max_people[ages[i[0]]] -= 1
+            k_adults += 1
             if len(i) == 2:
-                ages[i[1]] = np.random.choice(range(n_ages), p=weighted(max_people * (age_range[1] if np.random.rand() > 0.9 else age_range[0])))
+                ages[i[1]] = ages_res_two[k_two_size]
                 max_people[ages[i[1]]] -= 1
-
-    for i in aux:
+                k_two_size +=1
+     
+    ages_res = np.random.choice(range(n_ages), p = weighted(max_people), size = np.count_nonzero(ages == -1))
+    j = 0    
+    for i in res:
         if len(i) > 2:
-            for j in range(1, len(i)):
-                ages[i[j]] = np.random.choice(range(n_ages), p=weighted(max_people))
-                max_people[ages[i[j]]] -= 1
+            ages[i[1:]] = ages_res[j:(j+len(i) -1)]
+            max_people[ages[i[1:]]] -= 1
+            j += len(i) -1
     return ages
+
