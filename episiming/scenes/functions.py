@@ -607,25 +607,28 @@ def gen_pop_age(res, res_size, weights, age_groups, n_pop, adult_age = 19, two_r
     """
     n_ages = len(weights)
     ages = -1 * np.ones(n_pop, int)
-    max_people = np.ceil(n_pop * weights / sum(weights))
-    aux = np.random.rand(n_pop)
+    max_people = np.ceil((n_pop * weights) / sum(weights))
     age_range = [(np.tanh(i * (age_groups - adult_age)) + 1) / 2 for i in [2/3, -2/3]]
     rng_ages = range(n_ages)
     
     ages_res_adults = np.random.choice(rng_ages, p = weighted(max_people*age_range[0]), size = len(res))
-    ages_res_two = np.random.choice(rng_ages, p = weighted(max_people * (age_range[1] if np.random.rand() > two_res_prob else age_range[0])), size = np.count_nonzero(res_size == 2))
     k_adults = 0
-    k_two_size = 0
     for i in res:
         if len(i) > 0:
             ages[i[0]] = ages_res_adults[k_adults]
             max_people[ages[i[0]]] -= 1
             k_adults += 1
-            if len(i) == 2:
-                ages[i[1]] = ages_res_two[k_two_size]
-                max_people[ages[i[1]]] -= 1
-                k_two_size +=1
-     
+
+    max_people[max_people < 0] = 0
+    ages_res_two = np.random.choice(rng_ages, p = weighted(max_people * (age_range[1] if np.random.rand() > two_res_prob else age_range[0])), size = np.count_nonzero(res_size == 2))
+    k_two_size = 0   
+    for i in res:
+        if len(i) == 2:
+            ages[i[1]] = ages_res_two[k_two_size]
+            max_people[ages[i[1]]] -= 1
+            k_two_size +=1
+
+    max_people[max_people < 0] = 0
     ages_res = np.random.choice(range(n_ages), p = weighted(max_people), size = np.count_nonzero(ages == -1))
     j = 0    
     for i in res:
