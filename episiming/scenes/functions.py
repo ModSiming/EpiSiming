@@ -480,11 +480,11 @@ def start_case_distribution(scale, dic_cases, mtrx_locations, res_pos, res_pop, 
                 j += 1
                 
 
-    ys = np.floor(d*scipy.stats.weibull_min.rvs(c, size = len(np.hstack(cases_infect))))
+    ys = np.floor(d*weibull_min.rvs(c, size = len(np.hstack(cases_infect))))
     cases = {k:ys[i] for (i,k) in enumerate(np.hstack(cases_infect))} # k = indice da pessoa : tempo de infecção (já com a weibull)
     return cases
 
-def kappa_generator(num_pop, eps1, ep2, eta = np.sqrt(-2*np.log(np.log(2))), gamma = 1/2.6, loc = 0.2, factor = 3.5): 
+def kappa_generator(num_pop, eps1, eps2, eta = np.sqrt(-2*np.log(np.log(2))), gamma = 1/2.6, loc = 0.2, factor = 3.5): 
     """
     Generates the kappa function.
 
