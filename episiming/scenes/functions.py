@@ -484,7 +484,34 @@ def start_case_distribution(scale, dic_cases, mtrx_locations, res_pos, res_pop, 
     cases = {k:ys[i] for (i,k) in enumerate(np.hstack(cases_infect))} # k = indice da pessoa : tempo de infecção (já com a weibull)
     return cases
 
-def kappa_generator(num_pop, eps1, eps2, eta = np.sqrt(-2*np.log(np.log(2))), gamma = 1/2.6, loc = 0.2, factor = 3.5): 
+def symptoms_distribution(num_pop, percentile = 1/3):
+    """
+    Generates the list of type of infection.
+
+    Selects a percentile of the population to be asymptomatic
+
+    Input:
+    ------
+        
+        num_pop: int
+            size of population
+        
+        percentile: float in (0,1)
+            percentile of asymptomatic
+
+    Output:
+    -------
+        vec_symptoms: array
+            array of 0 and 1 representing type of infection 
+            (asymptomatic and symptomatic)
+    """
+    vec_symptoms = np.ones(num_pop)
+    indexes = np.random.choice(np.arange(0,num_pop,1), num_pop//3, replace = False)
+    vec_symptoms[indexes] = 0
+    return vec_symptoms
+    
+
+def kappa_generator(num_pop, eps1, eps2, eta = np.sqrt(-2*np.log(np.log(2))), gamma = 1/2.6, loc = 0.2, factor = 3.5, distribution = 'uniform'): 
     """
     Generates the kappa function.
 
@@ -515,18 +542,27 @@ def kappa_generator(num_pop, eps1, eps2, eta = np.sqrt(-2*np.log(np.log(2))), ga
 
         factor: float
             factor multiplying the lognorm pdf
+        
+        distribution: string (uniform or gaussian)
+            distribution of noise_eta and noise_delta
+            
 
     Output:
     -------
         noises: list
             list of deltas and etas for each person in population
     """
-    
     delta = np.log(np.log(2)/gamma)
-    pop = np.arange(num_pop)
-    noise_delta = delta + eps1 * np.random.rand(pop)
-    noise_eta = eta + eps2 * np.random.rand(pop)
+    
+    if distribution == 'gaussian':
+        noise_delta = delta + eps1 * np.random.normal(size = num_pop)
+        noise_eta = eta + eps2 * np.random.normal(size = num_pop)
+
+    else:
+        noise_delta = delta + eps1 *(np.random.rand(num_pop) - 0.5)
+        noise_eta = eta + eps2 *(np.random.rand(num_pop) - 0.5)
     return [noise_delta, noise_eta]
+
 
 def weighted(l):
     '''
