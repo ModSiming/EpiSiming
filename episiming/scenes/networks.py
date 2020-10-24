@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import episiming.scenes.functions
 
 class School:
 
@@ -164,3 +165,171 @@ class School:
         self.select_students()
         self.gen_school_position()
         self.alloc_students()
+
+class Workplace:
+    def __init__(self, scale, pop_matrix, pop_ages, bl_pop, pop_num, eap_num, eap_ages, eap_ratio_ages, tam_min, tam_max, z3_a, z3_c, a_dist, c_dist):
+        self.scale = scale
+
+        self.pop_matrix = pop_matrix
+        self.pop_ages = pop_ages
+        self.bl_pop = bl_pop
+        self.tam_min = tam_min
+        self.tam_max = tam_max
+        self.z3_a = z3_a
+        self.z3_c = z3_c
+        self.a_dist = a_dist
+        self.c_dist = c_dist
+
+        self.emp_pop_z3 = []
+        self.emp_tam_z3 = []
+        self.emp_num_z3 = []
+
+        self.emp_bloco_pos = []
+        self.emp_por_bloco = []
+        self.emp_tam = []
+
+        self.emp_membros_blocos = []
+        self.emp_membros = []
+
+        self.pop_num = pop_num
+        self.eap_num = eap_num
+
+        self.eap_fractions = []
+        self.eap_ages = eap_ages
+        self.eap_ratio_ages = eap_ratio_ages
+
+    def zipf3_acum(self, a, c, k_max, k):
+        return (((1.0 + k_max/a)/(1.0 + k/a))**c - 1)/((1 + k_max/a)**c - 1.0)
+
+    def zipf3(self, a, c, k_max, k):
+        return self.zipf3_acum(a, c, k_max, k-1) - self.zipf3_acum(a, c, k_max, k)
+
+
+    def zipf3e(self, a, c, k_max, k):
+        return self.zipf3(a, c, k_max, k)/k
+
+    def quantifica_empresas_por_tamanho(self, verbose=False):
+
+        emp_tam_z3 = np.arange(self.tam_min, 2*self.tam_max)
+        emp_num_z3 = (self.eap_num*self.zipf3e(self.z3_a, self.z3_c, 2*self.tam_max, emp_tam_z3)).astype(int)
+        emp_num_z3 = emp_num_z3[emp_num_z3>0]
+        emp_tam_z3 = np.array(list(range(self.tam_min, self.tam_min + len(emp_num_z3))))
+        emp_pop_z3 = np.array([(self.tam_min + k)*emp_num_z3[k] for k in range(len(emp_num_z3))])
+
+        if not len(emp_tam_z3):
+            print('Não foi possível distribuir as empresas, tente com outros parâmetros')
+        elif verbose:
+            print(f'Total da população: {self.pop_num}')
+            print(f'Total da força de trabalho (PEA): {self.eap_num}')
+            print(f'Número de tamanhos de empresas: {len(emp_num_z3)}')
+            print(f'Número de empresas: {emp_num_z3.sum()}')
+            print(f'Tamanhos de empresas: de {emp_tam_z3.min()} a {emp_tam_z3.max()}')
+            print(f'Número de indivíduos nas empresas (PEA ocupados): {emp_pop_z3.sum()}')
+            print(f'Média de indivíduos por empresa: {emp_pop_z3.sum()/emp_num_z3.sum()}')
+            print('Porcentagem de indivíduos da força de trabalho nas empresas: '
+                + f'{100*emp_pop_z3.sum()/self.eap_num:.1f}%')
+            print(f'Distribuição do número de empresas por tamanho: \n{emp_num_z3}')
+            print(f'Distribuição do número de indivíduos por tamanho de empresa: \n{emp_pop_z3}')
+        
+        self.emp_tam_z3 = emp_tam_z3
+        self.emp_num_z3 = emp_num_z3
+        self.emp_pop_z3 = emp_pop_z3
+
+    def aloca_empresas(self):
+
+        pop_por_bloco_flat = self.pop_matrix.flatten()
+        emp_loc = random.choices(list(range(len(pop_por_bloco_flat))),
+                                pop_por_bloco_flat, k=self.emp_num_z3.sum())
+
+        emp_por_bloco = np.zeros_like(self.pop_matrix)
+
+        emp_bloco_pos = list()
+        emp_tam = list()
+        k_nivel = 0
+        for k in range(len(emp_loc)):
+            if k >= self.emp_num_z3[:k_nivel+1].sum():
+                k_nivel += 1
+            emp_tam.append(self.tam_min + k_nivel)
+            loc = emp_loc[k]
+            emp_bloco_pos.append((loc // 83, loc % 83))
+            emp_por_bloco[loc // 83, loc % 83] += 1
+
+        self.emp_bloco_pos = emp_bloco_pos
+        self.emp_por_bloco = emp_por_bloco
+        self.emp_tam = emp_tam
+
+    def aloca_emp_membros_blocos(self):
+
+        i = np.arange(0.5, 0.5 + self.emp_por_bloco.shape[0])
+        j = np.arange(0.5, 0.5 + self.emp_por_bloco.shape[1])
+        jj, ii = np.meshgrid(j,i)
+
+        emp_membros_blocos = list()
+
+        f_dist = lambda dist: 1/(1 + (dist/self.a_dist)**self.c_dist)
+
+        for k in range(len(self.emp_num_z3)):
+            for j in range(self.emp_num_z3[k]):
+                dist =  np.sqrt((jj - self.emp_bloco_pos[k+j][1])**2 
+                                + (ii - self.emp_bloco_pos[k+j][0])**2)
+                k_dist = f_dist(dist)*self.pop_matrix
+                emp_membros_blocos.append(
+                    random.choices(
+                        list(range(self.emp_por_bloco.shape[0]*self.emp_por_bloco.shape[1])),
+                        k_dist.flatten(),
+                        k = self.tam_min + k
+                    )
+                )
+
+        self.emp_membros_blocos = emp_membros_blocos
+
+    def aloca_emp_individuos(self):
+        '''
+        Aloca os indivíduos em cada empresa.
+        '''
+        
+        indices = np.arange(len(self.pop_ages))
+        pop_pia_indices = indices[self.pop_ages >= 16]    
+        
+        # Define os pesos de cada individuo segundo a sua idade e os pesos para cada idade
+        pesos = self.eap_fractions[self.pop_ages[pop_pia_indices]]
+        pesos /= pesos.sum() # probabities must add up to 1
+        pop_pia_livres = np.random.choice(pop_pia_indices,
+                                        size=self.emp_pop_z3.sum(),
+                                        replace=False,
+                                        p=pesos)
+        
+        # Escolhe aleatoriamete um indivíduo em cada bloco alocado
+        emp_membros = list()
+
+        for j in range(len(self.emp_tam)):
+            membros_j = list()
+            for l in self.emp_membros_blocos[j]:
+                aux = pop_pia_livres[pop_pia_livres >= self.bl_pop[l]]
+                candidatos = aux[aux < self.bl_pop[l+1]]
+                if len(candidatos):
+                    individuo = random.choice(candidatos)
+                    membros_j.append(individuo)
+                    pop_pia_livres = pop_pia_livres[pop_pia_livres != individuo]
+            emp_membros.append(membros_j)
+
+        # Alguns blocos podem não ter mais indivíduos economicamente ativos disponíveis
+        # então completamos com indivíduos de outros blocos quaisquer, 
+        # portanto, sem peso segundo a distância.
+        for j in range(len(self.emp_tam)):
+            faltam = self.emp_tam[j] - len(emp_membros[j])
+            if faltam > 0:
+                membros_j = list(np.random.choice(pop_pia_livres, size=faltam,
+                                                replace=False))
+                emp_membros[j] += membros_j
+                for individuo in membros_j:
+                    pop_pia_livres = pop_pia_livres[pop_pia_livres != individuo]
+        
+        self.emp_membros = emp_membros
+
+    def gen_workplace_network(self, verbose = False):
+        self.eap_fractions = episiming.scenes.functions.get_age_fractions(self.eap_ages, self.eap_ratio_ages, age_max=110)
+        self.quantifica_empresas_por_tamanho(verbose = verbose)
+        self.aloca_empresas()
+        self.aloca_emp_membros_blocos()
+        self.aloca_emp_individuos()
