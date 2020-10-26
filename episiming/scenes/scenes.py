@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 from scipy import stats
 
 import episiming.scenes.functions as funcs
+import episiming.scenes.networks
 
 # type hints shotcuts
 List = typing.List
@@ -317,7 +318,7 @@ class Random(Scene):
 
 
 class RiodeJaneiro(Scene):
-    def __init__(self, scale: float = 1) -> None:
+    def __init__(self, scale: float = 1, workplace = True) -> None:
         """
         Instantiates the region.
 
@@ -332,7 +333,15 @@ class RiodeJaneiro(Scene):
         self.set_infectivity()
         self.set_kappa()
         self.set_pop_age()
-
+        if workplace == True:
+            eap_num_2010 = np.array([0, 902115, 1448515, 495289, 241619])
+            eap_ratio = 0.4885
+            eap_num = int(eap_ratio * len(self.pop_age))
+            eap_ages = np.array([0, 16, 30, 50, 60])
+            eap_ratio_ages = eap_num_2010/eap_num_2010.sum()
+            self.workplace = episiming.scenes.networks.Workplace(self, eap_num, eap_ages, eap_ratio_ages, 2, 1000, 5.2, 1.5, 3, 4)
+            self.workplace.gen_workplace_network()
+     
     def set_foundation(self, scale: float = 1) -> None:
         pop_matrix_file \
             = os.path.join(os.path.dirname(__file__),
