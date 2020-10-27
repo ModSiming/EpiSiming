@@ -436,7 +436,7 @@ def start_case_distribution(scale, dic_cases, mtrx_locations, res_pos, res_pop, 
     c: float
         shape parameter of weibull distribution
    
-   d: float
+    d: float
        scale parameter of weibull distribution
        
    Output:
@@ -484,7 +484,7 @@ def start_case_distribution(scale, dic_cases, mtrx_locations, res_pos, res_pop, 
     cases = {k:ys[i] for (i,k) in enumerate(np.hstack(cases_infect))} # k = indice da pessoa : tempo de infecção (já com a weibull)
     return cases
 
-def symptoms_distribution(num_pop, percentile = 1/3):
+def symptoms_distribution(num_pop, percentile = 1/3, c_latency = 1, d_latency = 1, c_incubation = 1, d_incubation = 1):
     """
     Generates the list of type of infection.
 
@@ -499,69 +499,87 @@ def symptoms_distribution(num_pop, percentile = 1/3):
         percentile: float in (0,1)
             percentile of asymptomatic
 
+        c_latency: float
+            shape parameter of weibull distribution (latency)
+   
+        d_latency: float
+            scale parameter of weibull distribution (latency)
+            
+        c_incubation: float
+            shape parameter of weibull distribution (incubation)
+   
+        d_incubation: float
+            scale parameter of weibull distribution (incubation)
+            
+
+
     Output:
     -------
         vec_symptoms: array
             array of 0 and 1 representing type of infection 
             (asymptomatic and symptomatic)
+        vec_exposure_time: array
+            array of integers representing time of exposure 
+            (either latency or incubation) 
+            (asymptomatic and symptomatic)
     """
-    vec_symptoms = np.ones(num_pop)
-    indexes = np.random.choice(np.arange(0,num_pop,1), num_pop//3, replace = False)
+    vec_symptoms = np.ones(num_pop, dtype = int)
+    indexes = np.random.choice(np.arange(0,num_pop,1), num_pop//int(1/percentile), replace = False)
     vec_symptoms[indexes] = 0
-    return vec_symptoms
+    vec_exposure_time = np.ones(num_pop)
+    latency_time = np.floor(d_latency*weibull_min.rvs(c_latency, size = len(indexes)))
+    incubation_time = np.floor(d_incubation*weibull_min.rvs(c_incubation, size = num_pop - len(indexes) ))
+    vec_exposure_time[vec_symptoms == 0] = latency_time
+    vec_exposure_time[vec_symptoms == 1] = incubation_time
+    
+    return vec_symptoms, vec_exposure_time
     
 
-def kappa_generator(num_pop, eps1, eps2, eta = np.sqrt(-2*np.log(np.log(2))), gamma = 1/2.6, loc = 0.2, factor = 3.5, distribution = 'uniform'): 
+def kappa_generator(num_pop, eps1, eps2, gamma = 1/2.6, eta = np.sqrt(-2*np.log(np.log(2))), distribution = 'uniform'): 
     """
     Generates the kappa function.
 
-    Each individual is assigned to a lognorm pdf
+    Each individual is assigned to a uniform or gaussian pdf
     such that the parameters are given by set values
-    delta and eta plus some noise eps.
+    delta and eta plus some random eps.
 
     Input:
     ------
         
-        res_pop: list
-            Nested list of individuals by residence
+        num_pop: int
+            Size of population
 
         eps1: float
             maximum value of noise to be added to delta 
             
         eps2: float
             maximum value of noise to be added to eta 
-            
-        eta: float
-            scale parameter of the lognorm pdf
         
         gamma: float
             the s parameter of the lognorm pdf is given by log(2)/gamma
         
-        loc: float
-            loc parameter of the lognorm pdf
+        eta: float
+            scale parameter of the lognorm pdf
 
-        factor: float
-            factor multiplying the lognorm pdf
-        
         distribution: string (uniform or gaussian)
             distribution of noise_eta and noise_delta
             
 
     Output:
     -------
-        noises: list
+        values of eta and delta: list
             list of deltas and etas for each person in population
     """
     delta = np.log(np.log(2)/gamma)
     
     if distribution == 'gaussian':
-        noise_delta = delta + eps1 * np.random.normal(size = num_pop)
-        noise_eta = eta + eps2 * np.random.normal(size = num_pop)
+        random_delta = delta + eps1 * np.random.normal(size = num_pop)
+        random_eta = eta + eps2 * np.random.normal(size = num_pop)
 
     else:
-        noise_delta = delta + eps1 *(np.random.rand(num_pop) - 0.5)
-        noise_eta = eta + eps2 *(np.random.rand(num_pop) - 0.5)
-    return [noise_delta, noise_eta]
+        random_delta = delta + eps1 *(np.random.rand(num_pop) - 0.5)
+        random_eta = eta + eps2 *(np.random.rand(num_pop) - 0.5)
+    return [random_delta, random_eta]
 
 
 def weighted(l):
