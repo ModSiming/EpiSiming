@@ -1,0 +1,54 @@
+Let n be the size of the population.
+
+# ages.eps
+    File with Int64 n-vector containing the age of each individual.
+
+# asymptomatic.eps
+    File with Boolean n-vector containing whether the individual is going to be asymptomatic or not.
+
+# initialState.eps
+    File with n-Int64 vector containing the initial state of each individual where:
+        1 - Susceptible
+        2 - Exposed
+        3 - Asymptomatic
+        4 - Infected
+        5 - Recovered
+
+# initialTransitions.eps
+    File with Int64 matrix (n x 3) containing the transition day for each state where:
+        The first columns shows the transition day from Susceptible to Exposed
+        The second columns shows the transition day from Exposed to Asymptomatic/Infected
+        The third columns shows the transition day from Asymptomatic/Infected to Recovered
+
+# positions.eps
+    File with Float64 matrix (n x 2) containing the position for each individual.
+
+# preInfectionPeriod.eps
+    File with Int64 n-vector containing the incubation time of each individual.
+
+# rho.eps
+    File with Float64 n-vector containing the rho parameter of each individual.
+
+# squares.eps
+    File with Int64 n-vector containing the square that each individual belongs.
+
+# viralCharge.eps
+    File with Float64 matrix (n x t) where t is the maximum time (someone can be infected), containing the viral charge for each individual at each infection day.
+
+# networks Folder
+    Contains all the networks to be considered, for each network let m be its number of particles, the folowing files are required:
+
+    # peopleParticle.eps
+        File with Int64 n-vector containing the index of the particle that each individual belongs (if the individual doesn't belong to any particle of that network the value must be -1).
+
+    # position.eps
+        File with Float64 matrix (m x 2) containing the position for each particle.
+    
+    # square.eps
+        File with Int64 m-vector containing the square that each particle belongs.
+    
+    # thetaa.eps
+        File with Float64 m-vector containing the transmission rate of asymptomatic individuals inside of each particle.
+    
+    # thetai.eps
+        File with Float64 m-vector containing the transmission rate of infected individuals inside of each particle.
