@@ -162,8 +162,8 @@ function timeStep(
     # determining the newly recovered population
     maxInfectionTime = size(population.viralCharge, 2)
     newR = BitArray(zeros(population.popSize))
-    newR[Ipop] .= (t .- transitions[Ipop, 2]) .> maxInfectionTime
-    newR[Apop] .= (t .- transitions[Apop, 2]) .> maxInfectionTime
+    newR[Ipop] .= (t .- transitions[Ipop, 2]) .>= maxInfectionTime
+    newR[Apop] .= (t .- transitions[Apop, 2]) .>= maxInfectionTime
     transitions[newR, 3] .= t
 
     # update all populations
