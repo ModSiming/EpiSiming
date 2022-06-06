@@ -11,7 +11,7 @@ compartimental and agent-based models.
 
 - [Beatriz Farah](https://github.com/beafarah)
 - [Cynthia Herkenhoff](https://github.com/herkenhoff-cynthia)
-- [Gil Miranda](https://github.com/mirandagil/)
+- [Gil Miranda](https://github.com/gil-miranda/)
 - [Ricardo Rosa](http://www.im.ufrj.br/rrosa/)
 - [Rodrigo Peregrino](https://github.com/rodlcp)
 - [Thiago Holleben](https://github.com/hollebenthiago)
